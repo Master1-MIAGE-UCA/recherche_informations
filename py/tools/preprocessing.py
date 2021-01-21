@@ -4,17 +4,15 @@ from nltk.stem import PorterStemmer
 from sklearn.feature_extraction.text import CountVectorizer
 import pandas as pd
 
+
+# sw : stopword option
 def tok(doc, sw=False):
-    result = []
-    for line in doc:
-        tokenized = nltk.word_tokenize(line)
-        if sw:
-            stop_words = set(stopwords.words('english'))
-            l = [word for word in tokenized if word not in stop_words and word.isalpha()]
-            result.append(l)
-        else:
-            l = [word for word in tokenized]
-            result.append(l)
+    tokenized = nltk.word_tokenize(doc)
+    if sw:
+        stop_words = set(stopwords.words('english'))
+        result = [word for word in tokenized if word not in stop_words and word.isalpha()]
+    else:
+        result = [word for word in tokenized]
     return result
 
 
