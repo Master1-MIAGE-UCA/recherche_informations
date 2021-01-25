@@ -22,7 +22,7 @@ for files in glob.glob("../docs/*.txt"):
         if line is not None:
             for words in tok(line, sw=True):
                 # On convertit les majuscules
-                words = words.lower()
+                #words = words.lower()
                 if words in df.terms:
                     df[words]["freq"] += 1
                 else:
