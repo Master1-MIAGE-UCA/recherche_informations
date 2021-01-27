@@ -6,7 +6,7 @@ import pandas as pd
 
 
 # sw : stopword option
-def tok(doc, sw=False):
+def preproc(doc, sw=False):
     tokenized = nltk.word_tokenize(doc)
     lemmatizer = WordNetLemmatizer()
     if sw:
@@ -15,22 +15,3 @@ def tok(doc, sw=False):
     else:
         result = [lemmatizer.lemmatize(word) for word in tokenized]
     return result
-
-
-def bow(doc, vectorizer=None):
-    doc = tok(doc, sw=True)
-    lemme = WordNetLemmatizer()
-    docs = []
-    for d in doc:
-        li = []
-        for word in d:
-            li.append(lemme.lemmatize(word))
-        docs.append(" ".join(li))
-    if vectorizer is None:
-        vectorizer = CountVectorizer()
-        bow = vectorizer.fit_transform(docs)
-    else:
-        bow = vectorizer.transform(docs)
-    bow = bow.toarray()
-    bow = pd.DataFrame(bow)
-    return bow, vectorizer
