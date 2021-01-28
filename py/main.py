@@ -2,7 +2,9 @@ import glob
 import re
 import pandas as pd
 from tools.preprocessing import preproc
-
+from tools.request import exec_request
+import numpy as np
+import pickle
 
 # On itère sur chacun des documents pour extraire les différents mots présents ayant passé les
 # étapes de segmentation et de lemmatisation afin de construire le dictionnaire et la matrice
@@ -49,43 +51,36 @@ def create_incidence_matrix():
         id_file += 1
         file.close()
     # On sauvegarde l'instance de notre dataframe dans un fichier .pkl
-    df.to_pickle("../docs/generated_data/matrix.pkl")
+    df.to_pickle("../docs/generated_data/incidence_matrix.pkl")
 
 
 def create_reverse_idx():
     # On récupère notre matrice d'incidence
-    matrix = pd.read_pickle("../docs/generated_data/matrix.pkl")
+    matrix = pd.read_pickle("../docs/generated_data/incidence_matrix.pkl")
     # Création du dictionnaire de mots
     dictionnary = [x for x in matrix.index]
     # Création de l'index inversé
-    idx_inv = pd.DataFrame(columns=["list_docs"])
+    idx_inv = {}
     # On construit la base de notre dataframe avec les mots du dictionnaires et une liste de documents vide
     for word in dictionnary:
-        idx_inv.loc[word] = [[]]
+        idx_inv[word] = matrix.columns[np.arange(len(matrix.columns))[matrix.loc[word] > 0]].tolist()
         print("[Line '", word, "'] added")
-    # On itère dans chaque élement de notre tableau et on va analyser en parallèle les lignes de notre
-    # matrice d'incidence
-    for idx in idx_inv.index:
-        # On fait la jointure entre la ligne du tableau et notre matrice
-        values = matrix.loc[idx]
-        # print(values)
-        # Pour chaques valeurs non nulles, on vient écrire le nom de la colonne (qui correspond au nom du fichier)
-        # dans la ligne correspondant au mot courant de notre index inversé
-        for doc_name in values.index:
-            if values.loc[doc_name] != 0:
-                idx_inv.loc[idx]["list_docs"].append(doc_name)
-        print("[Idx: '", idx, "'] done")
-    # On sauvegarde l'instance de notre dataframe dans un fichier .pkl
-    idx_inv.to_pickle("../docs/generated_data/idx_inv.pkl")
+    # On sauvegarde notre map dans un fichier .pkl tel que
+    with open("../docs/generated_data/idx_inv.pkl", "wb") as f:
+        pickle.dump(idx_inv, f, pickle.HIGHEST_PROTOCOL)
+    f.close()
+    print("Le fichier", f.name, "a été généré\n")
 
 
 print("[MAIN] lancement du programme 'main.py' : Recherche d'informations")
 end_program = False
 while end_program is False:
     request = input("Entrez une requete > ")
-    # Appel de notre algorithme de recherche
-
     # Arret du programme
     if request.lower() == "exit":
         print("[MAIN] Fin du programme")
         end_program = True
+        break
+    # Appel de notre algorithme de recherche
+    exec_request(request="disease AND severe AND pneumonia")
+    print("[FIN DE LA RECHERCHE]\n")
