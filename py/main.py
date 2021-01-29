@@ -6,6 +6,7 @@ from tools.request import exec_request
 import numpy as np
 import pickle
 
+
 # On itère sur chacun des documents pour extraire les différents mots présents ayant passé les
 # étapes de segmentation et de lemmatisation afin de construire le dictionnaire et la matrice
 # d'incidence.
@@ -82,5 +83,5 @@ while end_program is False:
         end_program = True
         break
     # Appel de notre algorithme de recherche
-    exec_request(request="disease AND severe AND pneumonia")
+    exec_request(request=request)
     print("[FIN DE LA RECHERCHE]\n")
